@@ -6,6 +6,12 @@
 
 j1PathFinding::j1PathFinding() : j1Module(), map(NULL), last_path(DEFAULT_PATH_LENGTH),width(0), height(0)
 {
+	pathFinished = false;
+	pathRequested = false;
+
+	open = new PathList;
+	close = new PathList;
+
 	name.create("pathfinding");
 }
 
@@ -57,6 +63,39 @@ uchar j1PathFinding::GetTileAt(const iPoint& pos) const
 		return map[(pos.y*width) + pos.x];
 
 	return INVALID_WALK_CODE;
+}
+
+void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
+{
+	this->origin = new iPoint(origin);
+	this->destination = new iPoint(destination);
+	pathRequested = true;
+
+}
+
+
+
+bool j1PathFinding::Update(float dt)
+{
+	if (pathRequested) {
+		j1Timer timer;
+		timer.Start();
+		LOG("Path Requested");
+		CreatePath(*origin, *destination);
+		
+		if (pathFinished) {
+			pathRequested = false;
+			RELEASE(origin);
+			RELEASE(destination);
+			open->list.clear();
+			close->list.clear();
+			pathFinished = false;
+		}
+
+		LOG("PathFinding time: %f", timer.ReadSec());
+	}
+
+	return true;
 }
 
 // To request all tiles involved in the last generated path
@@ -170,6 +209,7 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 {
 	j1Timer timer;
 	timer.Start();
+	
 	// TODO 1: if origin or destination are not walkable, return -1
 	if (!IsWalkable(origin) || !IsWalkable(destination)) 
 	{
@@ -178,25 +218,26 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 	}
 
 	// TODO 2: Create two lists: open, close
-	PathList open;
-	PathList close;
+	//PathList open;
+	//PathList close;
 
-	PathList adjacentNodes;
+
 
 	PathNode* node;
 	// Add the origin tile to open
-	open.list.add(PathNode(0, origin.DistanceTo(destination), origin, nullptr));
+	if (open->GetNodeLowestScore() == NULL)
+		open->list.add(PathNode(0, origin.DistanceTo(destination), origin, nullptr));
 
 	uint iterations = 0;
 
 	// Iterate while we have tile in the open list
-	while (open.GetNodeLowestScore() != NULL)
+	while (open->GetNodeLowestScore() != NULL && iterations < 50)
 	{
 		// TODO 3: Move the lowest score cell from open list to the closed list
 
-		node = new PathNode(open.GetNodeLowestScore()->data);
-		close.list.add(*node);
-		open.list.del(open.Find(node->pos));
+		node = new PathNode(open->GetNodeLowestScore()->data);
+		close->list.add(*node);
+		open->list.del(open->Find(node->pos));
 		
 		// TODO 4: If we just added the destination, we are done!
 		if (node->pos == destination) {
@@ -212,30 +253,32 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 			
 			// Use the Pathnode::parent and Flip() the path when you are finish
 			last_path.Flip();
+			pathFinished = true;
 			LOG("%f", timer.ReadSec());
 			return 1;
 		}
 
 		// TODO 5: Fill a list of all adjancent nodes
+		PathList adjacentNodes;
 		uint numNodes = node->FindWalkableAdjacents(adjacentNodes);
 
 		// TODO 6: Iterate adjancent nodes:
 		for (uint i = 0; i < numNodes; i++)
 		{
 			// ignore nodes in the closed list
-			if (close.Find(adjacentNodes.list[i].pos) == NULL) {
+			if (close->Find(adjacentNodes.list[i].pos) == NULL) {
 				// If it is NOT found, calculate its F and add it to the open list
-				if(open.Find(adjacentNodes.list[i].pos) == NULL) {
+				if(open->Find(adjacentNodes.list[i].pos) == NULL) {
 					adjacentNodes.list[i].CalculateF(destination);
-					open.list.add(adjacentNodes.list[i]);
+					open->list.add(adjacentNodes.list[i]);
 				}
 				// If it is already in the open list, check if it is a better path (compare G)
 				else {
-					if (adjacentNodes.list[i].g < open.Find(adjacentNodes.list[i].pos)->data.g) {
+					if (adjacentNodes.list[i].g < open->Find(adjacentNodes.list[i].pos)->data.g) {
 						// If it is a better path, Update the parent
 						adjacentNodes.list[i].CalculateF(destination);
-						open.list.del(open.Find(adjacentNodes.list[i].pos));
-						open.list.add(adjacentNodes.list[i]);
+						open->list.del(open->Find(adjacentNodes.list[i].pos));
+						open->list.add(adjacentNodes.list[i]);
 					}
 				}
 			}

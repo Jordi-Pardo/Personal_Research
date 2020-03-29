@@ -14,6 +14,7 @@
 // Details: http://theory.stanford.edu/~amitp/GameProgramming/
 // --------------------------------------------------
 
+struct PathList;
 class j1PathFinding : public j1Module
 {
 public:
@@ -43,6 +44,20 @@ public:
 
 	// Utility: return the walkability value of a tile
 	uchar GetTileAt(const iPoint& pos) const;
+
+	void RequestPath(const iPoint& origin, const iPoint& destination);
+
+	bool Update(float dt) override;
+	bool pathRequested;
+	bool pathFinished;
+
+
+	PathList* open;
+	PathList* close;
+
+	iPoint* origin;
+	iPoint* destination;
+
 
 private:
 
