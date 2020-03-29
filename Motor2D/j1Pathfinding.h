@@ -4,6 +4,7 @@
 #include "j1Module.h"
 #include "p2Point.h"
 #include "p2DynArray.h"
+#include "j1Timer.h"
 
 #define DEFAULT_PATH_LENGTH 50
 #define INVALID_WALK_CODE 255
@@ -14,6 +15,7 @@
 // Details: http://theory.stanford.edu/~amitp/GameProgramming/
 // --------------------------------------------------
 
+struct PathList;
 class j1PathFinding : public j1Module
 {
 public:
@@ -43,6 +45,22 @@ public:
 
 	// Utility: return the walkability value of a tile
 	uchar GetTileAt(const iPoint& pos) const;
+
+	void RequestPath(const iPoint& origin, const iPoint& destination);
+
+	bool Update(float dt) override;
+
+	bool pathRequested;
+	bool pathFinished;
+
+	PathList* open;
+	PathList* close;
+
+	iPoint* origin;
+	iPoint* destination;
+
+	j1Timer timer;
+
 
 private:
 
