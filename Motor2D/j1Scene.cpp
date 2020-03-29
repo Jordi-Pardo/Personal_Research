@@ -69,7 +69,9 @@ bool j1Scene::PreUpdate()
 			else {
 				LOG("Point: (%u,%u) is not Walkable", p.x, p.y);
 			}
+			
 			App->pathfinding->RequestPath(origin, p);
+			App->pathfinding->timer.Start();
 			origin_selected = false;
 		}
 		else

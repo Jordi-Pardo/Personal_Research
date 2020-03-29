@@ -2,7 +2,7 @@
 #include "p2Log.h"
 #include "j1App.h"
 #include "j1PathFinding.h"
-#include "j1Timer.h"
+
 
 j1PathFinding::j1PathFinding() : j1Module(), map(NULL), last_path(DEFAULT_PATH_LENGTH),width(0), height(0)
 {
@@ -78,9 +78,6 @@ void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
 bool j1PathFinding::Update(float dt)
 {
 	if (pathRequested) {
-		j1Timer timer;
-		timer.Start();
-		LOG("Path Requested");
 		CreatePath(*origin, *destination);
 		
 		if (pathFinished) {
@@ -90,9 +87,8 @@ bool j1PathFinding::Update(float dt)
 			open->list.clear();
 			close->list.clear();
 			pathFinished = false;
-		}
-
 		LOG("PathFinding time: %f", timer.ReadSec());
+		}
 	}
 
 	return true;
@@ -243,6 +239,7 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 		if (node->pos == destination) {
 			const PathNode* iterator = node;
 
+			last_path.Clear();
 			// Backtrack to create the final path
 			for ( iterator; iterator->pos != origin; iterator = iterator->parent)
 			{
@@ -284,8 +281,8 @@ int j1PathFinding::CreatePath(const iPoint& origin, const iPoint& destination)
 			}
 		}
 		iterations++;
-		LOG("Loops: %u", iterations);
 	}
+	LOG("Loops: %u", iterations);
 
 
 
