@@ -41,4 +41,4 @@ We're done from the Slicing part, now we'll focus on the Pooling part.
 - Improve A* algorithm using vectors instead p2List.
 - Add a timer to check how many time our PathFinding system spend calculating paths.
 
-![](DistanceTo.png)
+![](https://github.com/Jordi-Pardo/TimeSlicing-and-Pooling/blob/master/docs/thousands_units.png)
