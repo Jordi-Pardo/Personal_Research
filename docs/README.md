@@ -9,6 +9,8 @@ Imagine that we want to move 10 units in a small map, our Pathfinding system wil
 
 We'll talk about some methods to try to solve this problem. Time slicing and pooling, let's do this.
 
+![](thousands_units.png)
+
 # Selected approach
 
 We are sorry, this is a optimitzation topic so, it's difficult to find some media to show you where this problem could appear.
@@ -41,4 +43,3 @@ We're done from the Slicing part, now we'll focus on the Pooling part.
 - Improve A* algorithm using vectors instead p2List.
 - Add a timer to check how many time our PathFinding system spend calculating paths.
 
-![](thousands_units.png)
