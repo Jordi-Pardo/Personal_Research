@@ -1,6 +1,8 @@
 # Time Slicing and Pooling
 “Hi, I am [Jordi Pardo](https://www.linkedin.com/in/jordi-pardo-gutierrez), , student of the [Bachelor's Degree in Video Games by UPC at CITM](https://www.citm.upc.edu/ing/estudis/graus-videojocs/). This content is generated for the second year’s subject Project 2, under supervision of lecturer [Marc Garrigó](https://www.linkedin.com/in/mgarrigo/).
 
+Web presentation: [Time Slicing and Pooling](https://jordi-pardo.github.io/TimeSlicing-and-Pooling/)
+
 # Intro to the problem
 
 In a RTS game we'll be moving a bunch of units across the map. Pathfinding will determinate the path of each unit to reach a destination.
