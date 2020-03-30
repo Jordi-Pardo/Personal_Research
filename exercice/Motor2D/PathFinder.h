@@ -48,16 +48,17 @@ struct PathList
 };
 #pragma endregion
 
+// TODO 1: Just take a few minutes to undertand this new class and think from where it comes
+
 class PathFinder
 {
 public:
 	PathFinder();
 	~PathFinder();
 
-	// Main function to request a path from A to B
 	void PreparePath(const iPoint& origin, const iPoint& destination);
-	bool IteratePath();
 
+	bool IteratePath();
 
 	// To request all tiles involved in the last generated path
 	const p2DynArray<iPoint>* GetLastPath() const;
@@ -66,7 +67,6 @@ public:
 
 	bool Update();
 
-	bool initSuccessful;
 	bool pathCompleted;
 	bool available;
 
@@ -77,8 +77,6 @@ private:
 
 	iPoint origin;
 	iPoint destination;
-
-	int max_iterations;
 
 	// we store the created path here
 };

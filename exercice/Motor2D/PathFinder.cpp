@@ -3,9 +3,10 @@
 #include "j1App.h"
 #include "j1Pathfinding.h"
 
-PathFinder::PathFinder() : last_path(DEFAULT_PATH_LENGTH), initSuccessful(false), pathCompleted(false),max_iterations(50),available(true)
+PathFinder::PathFinder() : last_path(DEFAULT_PATH_LENGTH), pathCompleted(false),available(true)
 {
 	LOG("PathFinder created");
+	
 }
 
 PathFinder::~PathFinder()
@@ -20,74 +21,68 @@ void PathFinder::PreparePath(const iPoint& origin, const iPoint& destination)
 	if (open.GetNodeLowestScore() == NULL)
 		open.list.add(PathNode(0, origin.DistanceTo(destination), origin, nullptr));
 
-	uint iterations = 0;
-
 	this->origin = origin;
 	this->destination = destination;
-	initSuccessful = true;
 	available = false;
 	
 }
 
 bool PathFinder::IteratePath()
 {
-
+	//TODO 2: This function won't need a loop inside anymore, we are controlling this loop outside
 	bool ret = true;
-	// TODO 3: Move the lowest score cell from open list to the closed list
-	PathNode* node = new PathNode(open.GetNodeLowestScore()->data);
-	close.list.add(*node);
-	open.list.del(open.Find(node->pos));
+	while (ret) {
+		PathNode* node = new PathNode(open.GetNodeLowestScore()->data);
+		close.list.add(*node);
+		open.list.del(open.Find(node->pos));
 
-	// TODO 4: If we just added the destination, we are done!
-	if (node->pos == destination) {
-		const PathNode* iterator = node;
+		if (node->pos == destination) {
+			const PathNode* iterator = node;
 
-		last_path.Clear();
-		// Backtrack to create the final path
-		for (iterator; iterator->pos != origin; iterator = iterator->parent)
-		{
-			last_path.PushBack(iterator->pos);
+			last_path.Clear();
+			// Backtrack to create the final path
+			for (iterator; iterator->pos != origin; iterator = iterator->parent)
+			{
+				last_path.PushBack(iterator->pos);
+			}
+
+			last_path.PushBack(origin);
+
+			last_path.Flip();
+			pathCompleted = true;
+			available = true;
+			open.list.clear();
+			close.list.clear();
+			RELEASE(node);
+			ret = false;
+			return ret;
 		}
 
-		last_path.PushBack(origin);
+		PathList adjacentNodes;
+		uint numNodes = node->FindWalkableAdjacents(adjacentNodes);
 
-		// Use the Pathnode::parent and Flip() the path when you are finish
-		last_path.Flip();
-		pathCompleted = true;
-		initSuccessful = false;
-		available = true;
-		open.list.clear();
-		close.list.clear();
-		RELEASE(node);
-		return false;
-	}
-
-	// TODO 5: Fill a list of all adjancent nodes
-	PathList adjacentNodes;
-	uint numNodes = node->FindWalkableAdjacents(adjacentNodes);
-
-	// TODO 6: Iterate adjancent nodes:
-	for (uint i = 0; i < numNodes; i++)
-	{
-		// ignore nodes in the closed list
-		if (close.Find(adjacentNodes.list[i].pos) == NULL) {
-			// If it is NOT found, calculate its F and add it to the open list
-			if (open.Find(adjacentNodes.list[i].pos) == NULL) {
-				adjacentNodes.list[i].CalculateF(destination);
-				open.list.add(adjacentNodes.list[i]);
-			}
-			// If it is already in the open list, check if it is a better path (compare G)
-			else {
-				if (adjacentNodes.list[i].g < open.Find(adjacentNodes.list[i].pos)->data.g) {
-					// If it is a better path, Update the parent
+		for (uint i = 0; i < numNodes; i++)
+		{
+			// ignore nodes in the closed list
+			if (close.Find(adjacentNodes.list[i].pos) == NULL) {
+				// If it is NOT found, calculate its F and add it to the open list
+				if (open.Find(adjacentNodes.list[i].pos) == NULL) {
 					adjacentNodes.list[i].CalculateF(destination);
-					open.list.del(open.Find(adjacentNodes.list[i].pos));
 					open.list.add(adjacentNodes.list[i]);
+				}
+				// If it is already in the open list, check if it is a better path (compare G)
+				else {
+					if (adjacentNodes.list[i].g < open.Find(adjacentNodes.list[i].pos)->data.g) {
+						// If it is a better path, Update the parent
+						adjacentNodes.list[i].CalculateF(destination);
+						open.list.del(open.Find(adjacentNodes.list[i].pos));
+						open.list.add(adjacentNodes.list[i]);
+					}
 				}
 			}
 		}
+		return ret;
 	}
-	return ret;
 }
 
 
@@ -100,18 +95,17 @@ const p2DynArray<iPoint>* PathFinder::GetLastPath() const
 
 bool PathFinder::Update()
 {
+	//TODO 2: Make a loop to take control on how many times the function "IteratePath" should be called in one frame
 	bool ret = true;
-	for (int i = 0; i < max_iterations && ret; i++)
-	{
-		 ret = IteratePath();
-	}
 
+	if (ret)
+		ret = IteratePath();
+	
 	return ret;
 }
 
 
 #pragma region PathList
-
 
 
 // PathList ------------------------------------------------------------------------

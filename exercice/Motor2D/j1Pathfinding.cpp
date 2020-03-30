@@ -8,7 +8,6 @@ j1PathFinding::j1PathFinding() : j1Module(), map(NULL),width(0), height(0),reque
 {
 	name.create("pathfinding");
 
-
 }
 
 // Destructor
@@ -22,11 +21,9 @@ bool j1PathFinding::CleanUp()
 {
 	LOG("Freeing pathfinding library");
 
-	for (int i = 0; i < pathfinderList.size(); i++)
-	{
-	pathfinderList[i]->last_path.Clear();
-	}
-	pathfinderList.clear();
+
+	pathfinder->last_path.Clear();
+
 	RELEASE_ARRAY(map);
 	return true;
 }
@@ -65,10 +62,11 @@ uchar j1PathFinding::GetTileAt(const iPoint& pos) const
 	return INVALID_WALK_CODE;
 }
 
+// TODO 3: Remember, now we want to iterate from all PathFinders and check if it's available.
+
 void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
 {
 	LOG("Requesting a path...");
-	// TODO 1: if origin or destination are not walkable, return -1
 	if (!IsWalkable(origin) || !IsWalkable(destination))
 	{
 		LOG("Origin or destination are not walkable");
@@ -76,24 +74,17 @@ void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
 	}
 	requestPath = true;
 
-	for (int i = 0; i < pathfinderList.size(); i++)
-	{
-		if (pathfinderList[i]->available) {
-			pathfinderList[i]->PreparePath(origin, destination);		
-			LOG("Requested succeed");
-			return;
-		}
+	if (pathfinder->available) {
+		pathfinder->PreparePath(origin, destination);
+		LOG("Requested succeed");
 	}
-
-
 }
 
 bool j1PathFinding::Start()
 {
-	PathFinder* pathfinder01 = new PathFinder;
-	PathFinder* pathfinder02 = new PathFinder;
-	pathfinderList.push_back(pathfinder01);
-	pathfinderList.push_back(pathfinder02);
+	//TODO 3: Add PathFinder to the vector.
+	pathfinder = new PathFinder;
+	
 	return true;
 }
 
@@ -104,13 +95,9 @@ bool j1PathFinding::Update(float dt)
 	if (!requestPath)
 		return true;
 
-	for (int i = 0; i < pathfinderList.size(); i++)
-	{
-		if (!pathfinderList[i]->available)
-			requestPath = pathfinderList[i]->Update();
-	}
-		
-
+	if (!pathfinder->available)
+		requestPath = pathfinder->Update();
+			
 	return true;
 }
 

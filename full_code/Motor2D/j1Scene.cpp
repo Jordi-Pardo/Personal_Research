@@ -118,6 +118,8 @@ bool j1Scene::Update(float dt)
 
 	App->render->Blit(debug_tex, p.x, p.y);
 
+	//TODO 3: Now you will be able to print more than one path, more loops :)
+
 	for (int i = 0; i < App->pathfinding->pathfinderList.size(); i++)
 	{
 		const p2DynArray<iPoint>* path = App->pathfinding->pathfinderList[i]->GetLastPath();

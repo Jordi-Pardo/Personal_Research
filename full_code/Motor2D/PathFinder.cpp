@@ -31,14 +31,14 @@ void PathFinder::PreparePath(const iPoint& origin, const iPoint& destination)
 
 bool PathFinder::IteratePath()
 {
-
+	//TODO 2: This function won't need a loop inside anymore, we are controlling this loop outside
 	bool ret = true;
-	// TODO 3: Move the lowest score cell from open list to the closed list
+
 	PathNode* node = new PathNode(open.GetNodeLowestScore()->data);
 	close.list.add(*node);
 	open.list.del(open.Find(node->pos));
 
-	// TODO 4: If we just added the destination, we are done!
+
 	if (node->pos == destination) {
 		const PathNode* iterator = node;
 
@@ -62,11 +62,11 @@ bool PathFinder::IteratePath()
 		return false;
 	}
 
-	// TODO 5: Fill a list of all adjancent nodes
+
 	PathList adjacentNodes;
 	uint numNodes = node->FindWalkableAdjacents(adjacentNodes);
 
-	// TODO 6: Iterate adjancent nodes:
+
 	for (uint i = 0; i < numNodes; i++)
 	{
 		// ignore nodes in the closed list
@@ -99,7 +99,8 @@ const p2DynArray<iPoint>* PathFinder::GetLastPath() const
 }
 
 bool PathFinder::Update()
-{
+{	
+	//TODO 2: Make a loop to take control on how many times the function "IteratePath" should be called in one frame
 	bool ret = true;
 	for (int i = 0; i < max_iterations && ret; i++)
 	{

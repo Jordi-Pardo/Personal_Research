@@ -51,7 +51,9 @@ public:
 
 	j1Timer timer;
 
-	std::vector<PathFinder*> pathfinderList;
+	// TODO 3: Create a vector of PathFinders to distribute the new paths. Make sure to iterate from all vector.
+	PathFinder* pathfinder;
+	
 private:
 
 	// size of the map

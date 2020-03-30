@@ -65,10 +65,12 @@ uchar j1PathFinding::GetTileAt(const iPoint& pos) const
 	return INVALID_WALK_CODE;
 }
 
+
+// TODO 3: Remember, now we want to iterate from all PathFinders and check if it's available.
+
 void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
 {
 	LOG("Requesting a path...");
-	// TODO 1: if origin or destination are not walkable, return -1
 	if (!IsWalkable(origin) || !IsWalkable(destination))
 	{
 		LOG("Origin or destination are not walkable");
@@ -90,6 +92,8 @@ void j1PathFinding::RequestPath(const iPoint& origin, const iPoint& destination)
 
 bool j1PathFinding::Start()
 {
+	//TODO 3: Add PathFinder to the vector.
+
 	PathFinder* pathfinder01 = new PathFinder;
 	PathFinder* pathfinder02 = new PathFinder;
 	pathfinderList.push_back(pathfinder01);

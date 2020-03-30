@@ -48,6 +48,8 @@ struct PathList
 };
 #pragma endregion
 
+// TODO 1: Just take a few minutes to undertand this new class and think from where it comes
+
 class PathFinder
 {
 public:
