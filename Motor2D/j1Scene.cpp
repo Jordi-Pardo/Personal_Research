@@ -63,30 +63,15 @@ bool j1Scene::PreUpdate()
 	{
 		if(origin_selected == true)
 		{
-			if (App->pathfinding->IsWalkable(p)) {
-				LOG("Point: (%u,%u) is Walkable",p.x,p.y);
-			}
-			else {
-				LOG("Point: (%u,%u) is not Walkable", p.x, p.y);
-			}
-			
 			App->pathfinding->RequestPath(origin, p);
-			App->pathfinding->timer.Start();
 			origin_selected = false;
 		}
 		else
 		{
-			if (App->pathfinding->IsWalkable(p)) {
-				LOG("Point: (%u,%u) is Walkable", p.x, p.y);
-			}
-			else {
-				LOG("Point: (%u,%u) is not Walkable", p.x, p.y);
-			}
 			origin = p;
 			origin_selected = true;
 		}
 	}
-
 	return true;
 }
 
@@ -133,13 +118,18 @@ bool j1Scene::Update(float dt)
 
 	App->render->Blit(debug_tex, p.x, p.y);
 
-	const p2DynArray<iPoint>* path = App->pathfinding->GetLastPath();
-
-	for(uint i = 0; i < path->Count(); ++i)
+	for (int i = 0; i < App->pathfinding->pathfinderList.size(); i++)
 	{
-		iPoint pos = App->map->MapToWorld(path->At(i)->x, path->At(i)->y);
-		App->render->Blit(debug_tex, pos.x, pos.y);
+		const p2DynArray<iPoint>* path = App->pathfinding->pathfinderList[i]->GetLastPath();
+
+		for (uint i = 0; i < path->Count(); ++i)
+		{
+			iPoint pos = App->map->MapToWorld(path->At(i)->x, path->At(i)->y);
+			App->render->Blit(debug_tex, pos.x, pos.y);
+		}
 	}
+
+
 
 	return true;
 }
